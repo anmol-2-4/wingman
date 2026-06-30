@@ -1,11 +1,7 @@
-"""
-Wingman backend — FastAPI over the memory wrapper.
-Run from project root:  uvicorn backend.main:app --reload
-"""
 from pathlib import Path
 
 from dotenv import load_dotenv
-load_dotenv()  # must run before backend.memory imports cognee
+load_dotenv()
 
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
@@ -34,8 +30,7 @@ async def remember(frag: Fragment):
 
 @app.post("/api/recall")
 async def recall(q: Query):
-    results = await memory.recall(q.text)
-    answers = [getattr(r, "text", str(r)) for r in results]
+    answers = await memory.recall(q.text)
     return {"query": q.text, "answers": answers}
 
 

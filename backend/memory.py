@@ -1,29 +1,26 @@
-"""
-Thin wrapper over Cognee's memory-lifecycle verbs.
-
-All app code calls THIS module, never cognee directly. The open-source build
-points at self-hosted Cognee (Ollama). The separate Cognee Cloud project will
-provide its own implementation of these same four functions, so the rest of the
-app is backend-agnostic.
-"""
 import cognee
 
 
-async def remember(text: str):
-    """Ingest a fragment into the memory graph."""
+def _entry_text(entry):
+    for field in ("answer", "content", "text"):
+        val = getattr(entry, field, None)
+        if val:
+            return str(val)
+    return str(entry)
+
+
+async def remember(text):
     return await cognee.remember(text)
 
 
-async def recall(query: str):
-    """Retrieve from memory; returns a list of result objects."""
-    return await cognee.recall(query_text=query)
+async def recall(query):
+    results = await cognee.recall(query_text=query)
+    return [_entry_text(r) for r in results]
 
 
 async def improve():
-    """Enrich / cross-link the graph (a.k.a. memify) for relational answers."""
     return await cognee.improve()
 
 
 async def forget():
-    """Wipe all memory state."""
     return await cognee.forget(everything=True)
