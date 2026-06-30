@@ -47,11 +47,6 @@ uvicorn backend.main:app --reload      # http://localhost:8000
 - LLM endpoint ends `/v1`; embedding endpoint ends `/api/embed`. They differ.
 - HTTP 500 on `remember`? Bump Ollama's `num_ctx` via a custom Modelfile.
 
-## AI assistance disclosure
-Per the hackathon rules (AI assistants permitted but must be declared): parts of this
-project were developed with the help of **Claude Code (Anthropic)** — used for scaffolding,
-boilerplate, and pair-programming. All design decisions, integration, and testing were
-directed and reviewed by the author.
 
 ## Roadmap (7-day)
 - **D1** Prove local `forget→remember→recall` loop ✅ scaffolded
