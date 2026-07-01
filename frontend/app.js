@@ -103,6 +103,16 @@ $("addBtn").onclick = async () => {
 async function loadSet(list, btnId) {
   const btn = $(btnId);
   btn.disabled = true;
+  // scope to this case: wipe any prior memory + evidence so scenarios don't mix
+  setStatus("Clearing the previous case…");
+  try { await post("/api/forget"); } catch (e) {}
+  evidence.length = 0;
+  hasMemory = false;
+  $("cards").innerHTML = '<p class="hint" id="emptyEv">Nothing logged yet.</p>';
+  $("answers").innerHTML = "";
+  $("evCount").textContent = "0";
+  $("graphPanel").hidden = true;
+  $("storyHint").textContent = "Reconstruct the night, then interrogate the memory below.";
   for (const f of list) { try { await post("/api/fragment", { text: f }); addCard(f); } catch (e) {} }
   setStatus(`${evidence.length} pieces of evidence logged — now Reconstruct.`);
   btn.disabled = false;
