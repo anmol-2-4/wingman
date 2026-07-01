@@ -47,8 +47,3 @@ from the README quickstart.
 
 ## Tech stack
 Cognee 1.2.2 (self-hosted) · Ollama (`qwen2.5:3b`, `nomic-embed-text`) · FastAPI · vanilla JS.
-
----
-
-> ⚠️ REMINDER (do at submit time): declare AI-assistant use in the form — required by the
-> rules; undisclosed = disqualification.
