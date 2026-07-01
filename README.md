@@ -8,15 +8,27 @@ night — a bar, a receipt, a blurry photo caption, a 2am text — and it uses
 those fragments into a queryable knowledge graph, then answers *"what happened last night?"*,
 reconstructs a timeline, and even flags the things you misremember.
 
+**In one line:** a personal knowledge-graph copilot for the messiest data of all — human memory.
+
 Built for the **WeMakeDevs × Cognee hackathon** ("The Hangover Part AI: Where's My
 Context?"), targeting **Best Use of Open Source**. It runs **100% locally, $0, no API keys** —
 self-hosted Cognee + Ollama.
 
 ---
 
-## Why it fits the theme
+## Where it fits the hackathon
 
-The theme is persistent, cross-session memory. Wingman is that idea made tangible:
+The theme is open — *"build anything, as long as you use Cognee for memory."* Mapped to the
+official inspiration examples, Wingman is:
+
+- **Primary — Example #02, Research & Knowledge Copilots.** The example describes *"ingest
+  content into a living knowledge graph, then recall answers with deep graph traversals."*
+  That is Wingman's exact engine: `remember()` builds the graph, `recall()` answers via graph
+  traversal — pointed at the messiest data of all, human memory, instead of research docs.
+- **Secondary — Example #01, Personal Memory Agents.** Memory that **persists and
+  accumulates across sessions**, so it never loses (or re-asks) what it already knew.
+
+Concretely, that persistent cross-session memory is made tangible:
 
 - **Persistent** — Cognee writes its graph + vectors to disk. Memories survive restarts.
 - **Cross-session & additive** — new fragments *update* what it knows. Tell it "the jacket
