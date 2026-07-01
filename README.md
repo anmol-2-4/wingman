@@ -16,6 +16,17 @@ self-hosted Cognee + Ollama.
 
 ---
 
+## The problem it solves
+
+LLMs are **stateless** — every request forgets the last session and quickly overflows the
+context window. Agents lose the plot; users re-explain themselves forever. The fix is a
+**permanent, self-hosted, hybrid graph-vector memory** that lets an agent *retain, connect,
+and carry context across infinite sessions*.
+
+Wingman is that fix, proven on the **hardest possible input**: fragmented, contradictory human
+memory of a night out. If it can rebuild *that* into a coherent, queryable, persistent memory
+— and catch what you misremember — ordinary agent context is easy.
+
 ## Where it fits the hackathon
 
 The theme is open — *"build anything, as long as you use Cognee for memory."* Wingman is a

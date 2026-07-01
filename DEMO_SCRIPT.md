@@ -12,7 +12,7 @@
 
 ### 0:00–0:15 — Hook
 - On screen: the Wingman header (Vegas vibe).
-- **VO:** "Your AI woke up in Vegas with no memory of last night. This is Wingman — it rebuilds lost context from scattered fragments, using Cognee's open-source graph-vector memory. Running 100% locally. Zero API keys."
+- **VO:** "Every LLM call is stateless — it forgets the last session and overflows its context window. That's the whole problem. Wingman fixes it with persistent memory. The demo: your AI woke up in Vegas with no memory of last night, and it rebuilds the context from scattered fragments — using Cognee's open-source graph-vector memory, 100% local, zero API keys."
 
 ### 0:15–0:45 — Drop the fragments
 - Click **Load demo night** → fragments stream into the log.
@@ -26,10 +26,10 @@
 - Click **View memory graph** → the interactive node graph opens. Slowly pan/zoom.
 - **VO:** "This is the actual memory Cognee built — me, Sarah, the Bellagio, the cab, all connected. 40-plus nodes from six fragments."
 
-### 1:45–2:15 — Interrogate + cross-session
+### 1:45–2:15 — Interrogate + cross-session (THE HERO BEAT — this is the point)
 - Ask: **"What happened last night?"** → show the reconstructed narrative.
 - Then add a NEW fragment: *"I left my jacket in the taxi, not the pool"* → **Remember** → ask **"Where's my jacket?"** → answer updates to the taxi.
-- **VO:** "I can interrogate the memory — and because Cognee memory is persistent and additive, new fragments update what it knows. Add a memory now, it's there next session. That's the whole point: never lose context again."
+- **VO:** "I interrogate the memory — answers come straight from the graph. And this is the point: Cognee memory is persistent and additive. I add a new fact, it updates what it knows, and it's still there next session — even after a restart. Stateless AI, solved. Context that survives, across infinite sessions."
 
 ### 2:15–2:40 — Contradiction detection (the differentiator)
 - Click **Spot contradictions** → show `CONFLICT: jacket at the pool || jacket in the taxi`.
