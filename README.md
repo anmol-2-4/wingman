@@ -18,17 +18,10 @@ self-hosted Cognee + Ollama.
 
 ## Where it fits the hackathon
 
-The theme is open — *"build anything, as long as you use Cognee for memory."* Mapped to the
-official inspiration examples, Wingman is:
-
-- **Primary — Example #02, Research & Knowledge Copilots.** The example describes *"ingest
-  content into a living knowledge graph, then recall answers with deep graph traversals."*
-  That is Wingman's exact engine: `remember()` builds the graph, `recall()` answers via graph
-  traversal — pointed at the messiest data of all, human memory, instead of research docs.
-- **Secondary — Example #01, Personal Memory Agents.** Memory that **persists and
-  accumulates across sessions**, so it never loses (or re-asks) what it already knew.
-
-Concretely, that persistent cross-session memory is made tangible:
+The theme is open — *"build anything, as long as you use Cognee for memory."* Wingman is a
+personal knowledge-graph copilot: it ingests content into a living knowledge graph and recalls
+answers via deep graph traversals — pointed at the messiest data of all, human memory. Its
+memory is persistent and cross-session:
 
 - **Persistent** — Cognee writes its graph + vectors to disk. Memories survive restarts.
 - **Cross-session & additive** — new fragments *update* what it knows. Tell it "the jacket
