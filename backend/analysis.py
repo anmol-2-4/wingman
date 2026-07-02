@@ -30,6 +30,7 @@ _STOP = {
     "the", "a", "an", "and", "or", "of", "to", "in", "on", "at", "was", "is", "are",
     "my", "your", "his", "her", "she", "he", "they", "it", "that", "this", "for",
     "said", "says", "not", "with", "narrator", "narrators", "pretty", "sure", "now",
+    "conflict",
 }
 
 
@@ -42,7 +43,6 @@ def _dedupe(conflicts):
     kept, sigs = [], []
     for c in conflicts:
         s = _sig(c)
-        # containment: same conflict if it shares most of the smaller fact-set
         if any(s and k and len(s & k) / min(len(s), len(k)) >= 0.6 for k in sigs):
             continue
         kept.append(c)
@@ -50,28 +50,29 @@ def _dedupe(conflicts):
     return kept
 
 
-async def _memory_context():
+async def _remembered_evidence():
+    """Pull the stored fragments verbatim via chunk-level recall, so every
+    remembered statement is on the table for the conflict scan."""
     results = await cognee.recall(
-        query_text="List every fact currently held in memory.",
-        query_type=SearchType.GRAPH_COMPLETION,
-        only_context=True,
+        query_text="all remembered evidence",
+        query_type=SearchType.CHUNKS,
         top_k=50,
     )
-    parts = []
+    texts = []
     for r in results:
-        d = r.get("search_result") if isinstance(r, dict) else getattr(r, "search_result", getattr(r, "text", r))
-        if isinstance(d, (list, tuple)):
-            parts.extend(str(x) for x in d)
-        else:
-            parts.append(str(d))
-    return "\n".join(parts)
+        t = r.get("text") if isinstance(r, dict) else getattr(r, "text", None)
+        if t:
+            texts.append(str(t))
+    return "\n".join(texts)
 
 
 async def find_contradictions():
-    context = await _memory_context()
+    evidence = await _remembered_evidence()
+    if not evidence.strip():
+        return ["No contradictions found."]
     client = get_llm_client()
     report = await client.acreate_structured_output(
-        text_input=context,
+        text_input=evidence,
         system_prompt=_SYSTEM,
         response_model=ConflictReport,
     )

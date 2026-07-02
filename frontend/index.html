@@ -8,59 +8,73 @@
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-  <header class="casebar">
-    <div class="filetag">CASE FILE · WNGMN-04B · built on Cognee</div>
-    <h1>Where's my context?</h1>
-    <p class="status"><span class="dot"></span><span id="statusText">A night in Vegas. No memory. Reconstruct it from the evidence.</span></p>
-    <div class="lifecycle">
-      <span class="verb">remember()</span><span class="arrow">→</span>
-      <span class="verb">recall()</span><span class="arrow">→</span>
-      <span class="verb">improve()</span><span class="arrow">→</span>
-      <span class="verb">forget()</span>
-      <span class="lifenote">the full Cognee memory lifecycle, self-hosted</span>
-    </div>
-  </header>
+  <div class="sheet">
+    <div class="holes" aria-hidden="true"><i></i><i></i><i></i></div>
 
-  <main class="board">
-    <section class="col evidence">
-      <div class="colhead">Evidence <span id="evCount" class="count">0</span></div>
-      <textarea id="fragment" placeholder="a receipt · a blurry photo · a half-remembered name"></textarea>
-      <div class="row">
-        <button id="addBtn">Log it</button>
-        <button id="seedBtn" class="ghost">Demo: the night</button>
-        <button id="seedBtn2" class="ghost">Demo: an outage</button>
+    <header class="letterhead">
+      <div class="lh-row">
+        <span class="lh-dept">Dept. of Lost Evenings</span>
+        <span class="lh-case">Case Nº WM-704</span>
+        <span class="lh-filed">Filed <span class="filedate">—</span></span>
+        <span class="lh-cognee">memory layer: Cognee · self-hosted</span>
       </div>
-      <div id="cards" class="cards"><p class="hint" id="emptyEv">Nothing logged yet.</p></div>
-      <div class="row actions">
-        <button id="reconstructBtn">Reconstruct</button>
-        <button id="enrichBtn" class="ghost">Connect the dots</button>
+      <h1>Where&rsquo;s my <em>context</em>?</h1>
+      <p class="status"><span class="dot"></span><span id="statusText">A night in Vegas. No memory. Reconstruct it from the evidence.</span></p>
+      <div class="lifecycle">
+        <span class="verb">remember()</span><span class="arrow">&rarr;</span>
+        <span class="verb">recall()</span><span class="arrow">&rarr;</span>
+        <span class="verb">improve()</span><span class="arrow">&rarr;</span>
+        <span class="verb">forget()</span>
+        <span class="lifenote">the full memory lifecycle, on the record</span>
       </div>
-      <div class="row">
-        <button id="graphBtn" class="ghost">Connection board</button>
-        <button id="forgetBtn" class="danger">Close case</button>
-      </div>
-      <p id="state" class="state"></p>
-    </section>
+    </header>
 
-    <section class="col story">
-      <div class="colhead">The story <span id="stamp" class="stamp" hidden>RECONSTRUCTED</span></div>
-      <p class="hint lead" id="storyHint">Reconstruct the night, then interrogate the memory below.</p>
-      <div class="askbar">
-        <span class="prompt">ask&gt;</span>
-        <input id="query" placeholder="what happened last night?" />
-        <button id="recallBtn">Ask</button>
-        <button id="contraBtn" class="ghost">Find conflicts</button>
-      </div>
-      <div id="chips" class="chips"></div>
-      <div id="answers"></div>
-    </section>
+    <main class="board">
+      <section class="col evidence">
+        <h2 class="colhead"><span class="sec">A</span> Exhibits <span id="evCount" class="count">0</span></h2>
+        <textarea id="fragment" placeholder="a receipt · a blurry photo · a half-remembered name" spellcheck="false"></textarea>
+        <div class="row">
+          <button id="addBtn">File exhibit</button>
+          <button id="seedBtn" class="ghost">load: the night</button>
+          <button id="seedBtn2" class="ghost">load: the outage</button>
+        </div>
+        <div id="cards" class="cards"><p class="hint" id="emptyEv">No exhibits filed.</p></div>
+        <div class="row actions">
+          <button id="reconstructBtn" class="big">Reconstruct</button>
+          <button id="enrichBtn" class="ghost">Connect the dots</button>
+        </div>
+        <div class="row">
+          <button id="graphBtn" class="ghost">Open the corkboard</button>
+          <button id="forgetBtn" class="danger">Burn the file</button>
+        </div>
+        <p id="state" class="state" aria-live="polite"></p>
+      </section>
 
-    <section class="col wide" id="graphPanel" hidden>
-      <div class="colhead">Connection board <span class="muted">— what Cognee remembers</span></div>
-      <p id="graphLoading" class="state"></p>
-      <iframe id="graphFrame" title="memory graph"></iframe>
-    </section>
-  </main>
+      <section class="col story">
+        <h2 class="colhead"><span class="sec">B</span> Interrogation <span id="stamp" class="stamp" hidden>RECONSTRUCTED</span></h2>
+        <p class="hint lead" id="storyHint">Reconstruct the night, then question the memory below.</p>
+        <div class="askbar">
+          <span class="prompt">Q.</span>
+          <input id="query" placeholder="what happened last night?" autocomplete="off" spellcheck="false" />
+          <button id="recallBtn">Ask</button>
+          <button id="contraBtn" class="ghost">Find contradictions</button>
+        </div>
+        <div id="chips" class="chips"></div>
+        <div id="answers" aria-live="polite"></div>
+      </section>
+
+      <section class="col wide" id="graphPanel" hidden>
+        <h2 class="colhead"><span class="sec">C</span> The corkboard <span class="muted">— everything the memory holds, strung together</span></h2>
+        <p id="graphLoading" class="state"></p>
+        <div class="framewrap"><iframe id="graphFrame" title="memory graph"></iframe></div>
+      </section>
+    </main>
+
+    <footer class="sheetfoot">
+      <span>Wingman — an amnesia reconstructor</span>
+      <span>if found, please return this file to the Bellagio front desk</span>
+    </footer>
+  </div>
 
   <script src="/static/app.js"></script>
 </body>

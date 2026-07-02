@@ -25,6 +25,40 @@ const QUESTIONS_NIGHT = ["what happened last night?", "who is Sarah?", "where is
 const QUESTIONS_INCIDENT = ["what caused the outage?", "was it the 2pm deploy?", "build the timeline of the incident"];
 let questions = QUESTIONS_NIGHT;
 
+// detective patter for the long waits — rotated under the spinner
+const PATTER = {
+  reconstruct: [
+    "interviewing each piece of evidence…",
+    "pinning red string between the facts…",
+    "checking alibis against the timestamps…",
+    "developing the blurry photos…",
+    "letting the memory graph settle…",
+    "good detective work takes a minute. hold tight…",
+  ],
+  improve: [
+    "re-reading every statement…",
+    "drawing new connections in red ink…",
+    "asking the graph what it missed the first time…",
+  ],
+  recall: [
+    "flipping through the case file…",
+    "following the red string…",
+    "consulting the corkboard…",
+  ],
+  contra: [
+    "comparing statements word for word…",
+    "circling discrepancies in red…",
+    "checking who changed their story…",
+  ],
+  graph: [
+    "arranging the photos on the corkboard…",
+    "untangling the string…",
+  ],
+};
+
+const EMPTY_EV = '<p class="hint" id="emptyEv">No exhibits filed.</p>';
+const HINT_DEFAULT = "Reconstruct the night, then question the memory below.";
+
 const evidence = [];
 let hasMemory = false;
 
@@ -52,13 +86,33 @@ async function post(path, body) {
   return res.json();
 }
 
-function busy(el, label, { center } = {}) {
+function busy(el, label, { center, lines } = {}) {
   const start = Date.now();
-  el.innerHTML = `<div class="${center ? "center" : ""}"><span class="spinner"></span> ${label} <span class="elapsed">0s</span></div>`;
+  el.innerHTML =
+    `<div class="busy${center ? " center" : ""}">` +
+    `<span class="spinner"></span>` +
+    `<span class="busytext">${label} <span class="elapsed">0s</span></span>` +
+    (lines && lines.length ? `<em class="busyline"></em>` : "") +
+    `</div>`;
   const span = el.querySelector(".elapsed");
-  const id = setInterval(() => { span.textContent = Math.round((Date.now() - start) / 1000) + "s"; }, 1000);
+  const lineEl = el.querySelector(".busyline");
+  let i = 0;
+  const showLine = () => {
+    lineEl.textContent = lines[i++ % lines.length];
+    lineEl.style.animation = "none";
+    void lineEl.offsetWidth; // restart the fade
+    lineEl.style.animation = "";
+  };
+  if (lineEl) showLine();
+  const id = setInterval(() => {
+    const s = Math.round((Date.now() - start) / 1000);
+    span.textContent = s + "s";
+    if (lineEl && s > 0 && s % 7 === 0) showLine();
+  }, 1000);
   return () => clearInterval(id);
 }
+
+const ROTS = ["-1.1deg", "0.9deg", "-0.5deg", "1.2deg"];
 
 function addCard(text) {
   const empty = $("emptyEv");
@@ -67,7 +121,7 @@ function addCard(text) {
   const n = evidence.length;
   const card = document.createElement("div");
   card.className = "card";
-  card.style.setProperty("--rot", (n % 2 ? "-0.8deg" : "0.9deg"));
+  card.style.setProperty("--rot", ROTS[n % ROTS.length]);
   const tag = document.createElement("div");
   tag.className = "etag";
   tag.textContent = "EXHIBIT " + String(n).padStart(2, "0");
@@ -85,11 +139,11 @@ function findings(items, cls, query) {
   if (query) {
     const q = document.createElement("div");
     q.className = "qlabel";
-    q.textContent = "ask> " + query;
+    q.textContent = "Q. " + query;
     box.appendChild(q);
   }
   if (!items || !items.length) {
-    box.insertAdjacentHTML("beforeend", '<div class="center">...the memory draws a blank.</div>');
+    box.insertAdjacentHTML("beforeend", '<div class="center">— the memory draws a blank —</div>');
     return;
   }
   for (const a of items) {
@@ -99,6 +153,15 @@ function findings(items, cls, query) {
     box.appendChild(div);
   }
 }
+
+// letterhead date stamp
+(function stampDate() {
+  const el = document.querySelector(".filedate");
+  if (!el) return;
+  const d = new Date();
+  const months = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+  el.textContent = `${String(d.getDate()).padStart(2, "0")} ${months[d.getMonth()]} ${d.getFullYear()}`;
+})();
 
 // on load: is there already memory (persisted from a previous session)?
 (async function init() {
@@ -113,7 +176,7 @@ $("addBtn").onclick = async () => {
   const text = $("fragment").value.trim();
   if (!text) return;
   $("addBtn").disabled = true;
-  try { await post("/api/fragment", { text }); addCard(text); $("fragment").value = ""; setStatus(`${evidence.length} pieces of evidence logged.`); }
+  try { await post("/api/fragment", { text }); addCard(text); $("fragment").value = ""; setStatus(`${evidence.length} exhibit${evidence.length === 1 ? "" : "s"} on file.`); }
   catch (e) { setStatus("error: " + e.message); }
   $("addBtn").disabled = false;
 };
@@ -127,14 +190,14 @@ async function loadSet(list, btnId, qs) {
   try { await post("/api/forget"); } catch (e) {}
   evidence.length = 0;
   hasMemory = false;
-  $("cards").innerHTML = '<p class="hint" id="emptyEv">Nothing logged yet.</p>';
+  $("cards").innerHTML = EMPTY_EV;
   $("answers").innerHTML = "";
   $("evCount").textContent = "0";
   $("graphPanel").hidden = true;
-  $("storyHint").textContent = "Reconstruct the night, then interrogate the memory below.";
+  $("storyHint").textContent = HINT_DEFAULT;
   renderChips();
   for (const f of list) { try { await post("/api/fragment", { text: f }); addCard(f); } catch (e) {} }
-  setStatus(`${evidence.length} pieces of evidence logged — now Reconstruct.`);
+  setStatus(`${evidence.length} exhibits filed — now hit Reconstruct.`);
   btn.disabled = false;
 }
 $("seedBtn").onclick = () => loadSet(DEMO, "seedBtn", QUESTIONS_NIGHT);
@@ -142,21 +205,23 @@ $("seedBtn2").onclick = () => loadSet(DEMO_INCIDENT, "seedBtn2", QUESTIONS_INCID
 
 $("reconstructBtn").onclick = async () => {
   $("reconstructBtn").disabled = true;
-  const stop = busy($("state"), "Reconstructing the night into memory…");
+  const stop = busy($("state"), "Reconstructing the night into memory…", { lines: PATTER.reconstruct });
   try {
     const d = await post("/api/reconstruct");
     hasMemory = true;
     renderChips();
-    setStatus("Memory reconstructed. Interrogate it, or open the connection board.");
-    $("storyHint").textContent = `Memory built — ${d.nodes || ""} facts. Ask it anything below.`;
+    setStatus("Memory rebuilt. Question it, or open the corkboard.");
+    $("storyHint").textContent = d.nodes
+      ? `Memory on file — ${d.nodes} facts recovered. Ask it anything below.`
+      : "Memory on file. Ask it anything below.";
   } catch (e) { setStatus("error: " + e.message); }
   finally { stop(); $("state").textContent = ""; $("reconstructBtn").disabled = false; }
 };
 
 $("enrichBtn").onclick = async () => {
-  if (!hasMemory) { setStatus("Reconstruct the night first — nothing to connect yet."); return; }
+  if (!hasMemory) { setStatus("Reconstruct first — nothing to connect yet."); return; }
   $("enrichBtn").disabled = true;
-  const stop = busy($("state"), "Connecting the dots…");
+  const stop = busy($("state"), "Connecting the dots…", { lines: PATTER.improve });
   let msg = "Connections enriched.";
   try {
     const d = await post("/api/improve");
@@ -166,25 +231,25 @@ $("enrichBtn").onclick = async () => {
 };
 
 $("forgetBtn").onclick = async () => {
-  if (!confirm("Close the case and erase all memory?")) return;
+  if (!confirm("Burn the file? All memory is erased.")) return;
   try {
     await post("/api/forget");
     evidence.length = 0; hasMemory = false;
-    $("cards").innerHTML = '<p class="hint" id="emptyEv">Nothing logged yet.</p>';
+    $("cards").innerHTML = EMPTY_EV;
     $("answers").innerHTML = ""; $("evCount").textContent = "0";
     $("graphPanel").hidden = true;
-    $("storyHint").textContent = "Reconstruct the night, then interrogate the memory below.";
+    $("storyHint").textContent = HINT_DEFAULT;
     renderChips();
-    setStatus("Case closed. Memory erased.");
+    setStatus("Case closed. The file is ash.");
   } catch (e) { setStatus("error: " + e.message); }
 };
 
 $("recallBtn").onclick = async () => {
   const text = $("query").value.trim();
   if (!text) return;
-  if (!hasMemory) { findings(["No memory on file yet — log evidence and hit Reconstruct first."], "finding", text); return; }
+  if (!hasMemory) { findings(["No memory on file yet — file exhibits and hit Reconstruct first."], "finding", text); return; }
   $("recallBtn").disabled = true;
-  const stop = busy($("answers"), "Searching the memory…", { center: true });
+  const stop = busy($("answers"), "Searching the memory…", { center: true, lines: PATTER.recall });
   try { const d = await post("/api/recall", { text }); stop(); findings(d.answers, "finding", text); }
   catch (e) { stop(); findings(["error: " + e.message], "finding"); }
   finally { $("recallBtn").disabled = false; }
@@ -193,18 +258,18 @@ $("recallBtn").onclick = async () => {
 $("contraBtn").onclick = async () => {
   if (!hasMemory) { findings(["No memory on file yet — reconstruct the night first."], "finding"); return; }
   $("contraBtn").disabled = true;
-  const stop = busy($("answers"), "Cross-checking for conflicting statements…", { center: true });
+  const stop = busy($("answers"), "Cross-checking every statement…", { center: true, lines: PATTER.contra });
   try { const d = await post("/api/contradictions"); stop(); findings(d.conflicts, "finding conflict"); }
   catch (e) { stop(); findings(["error: " + e.message], "finding"); }
   finally { $("contraBtn").disabled = false; }
 };
 
 $("graphBtn").onclick = () => {
-  if (!hasMemory) { setStatus("Reconstruct the night first — no graph to show yet."); return; }
+  if (!hasMemory) { setStatus("Reconstruct first — no corkboard to pin yet."); return; }
   const panel = $("graphPanel");
   panel.hidden = false;
   panel.scrollIntoView({ behavior: "smooth" });
-  const stop = busy($("graphLoading"), "Laying out the connection board…");
+  const stop = busy($("graphLoading"), "Laying out the corkboard…", { lines: PATTER.graph });
   const frame = $("graphFrame");
   frame.onload = () => { stop(); $("graphLoading").textContent = ""; };
   frame.src = "/api/graph?t=" + Date.now();
