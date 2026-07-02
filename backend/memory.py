@@ -4,16 +4,6 @@ import cognee
 from cognee.modules.search.types.SearchType import SearchType
 from cognee.infrastructure.databases.graph import get_graph_engine
 
-SEARCH_MODES = {
-    "ask": SearchType.GRAPH_COMPLETION,
-    "reason": SearchType.GRAPH_COMPLETION_COT,
-    "timeline": SearchType.TEMPORAL,
-}
-
-
-def _temporal_enabled():
-    return os.getenv("WINGMAN_TEMPORAL", "false").lower() in ("1", "true", "yes")
-
 
 def _text(entry):
     if isinstance(entry, dict):
@@ -29,9 +19,8 @@ async def remember(texts):
     return await cognee.remember(texts, self_improvement=False)
 
 
-async def recall(query, mode="ask"):
-    query_type = SEARCH_MODES.get(mode, SearchType.GRAPH_COMPLETION)
-    results = await cognee.recall(query_text=query, query_type=query_type)
+async def recall(query):
+    results = await cognee.recall(query_text=query, query_type=SearchType.GRAPH_COMPLETION)
     return [_text(r) for r in results]
 
 

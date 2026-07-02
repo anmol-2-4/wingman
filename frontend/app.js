@@ -21,8 +21,26 @@ const DEMO_INCIDENT = [
   "DB: the orders-index migration held a write lock on the orders table until 02:55; errors cleared at 02:56.",
 ];
 
+const QUESTIONS_NIGHT = ["what happened last night?", "who is Sarah?", "where is my jacket?"];
+const QUESTIONS_INCIDENT = ["what caused the outage?", "was it the 2pm deploy?", "build the timeline of the incident"];
+let questions = QUESTIONS_NIGHT;
+
 const evidence = [];
 let hasMemory = false;
+
+function renderChips() {
+  $("stamp").hidden = !hasMemory;
+  const box = $("chips");
+  box.innerHTML = "";
+  if (!hasMemory) return;
+  for (const q of questions) {
+    const b = document.createElement("button");
+    b.className = "chip";
+    b.textContent = q;
+    b.onclick = () => { $("query").value = q; $("recallBtn").click(); };
+    box.appendChild(b);
+  }
+}
 
 async function post(path, body) {
   const res = await fetch(path, {
@@ -87,7 +105,7 @@ function findings(items, cls, query) {
   try {
     const s = await (await fetch("/api/status")).json();
     hasMemory = s.has_memory;
-    if (hasMemory) $("storyHint").textContent = "Memory on file. Ask it anything below.";
+    if (hasMemory) { $("storyHint").textContent = "Memory on file. Ask it anything below."; renderChips(); }
   } catch (e) {}
 })();
 
@@ -100,7 +118,8 @@ $("addBtn").onclick = async () => {
   $("addBtn").disabled = false;
 };
 
-async function loadSet(list, btnId) {
+async function loadSet(list, btnId, qs) {
+  questions = qs || QUESTIONS_NIGHT;
   const btn = $(btnId);
   btn.disabled = true;
   // scope to this case: wipe any prior memory + evidence so scenarios don't mix
@@ -113,12 +132,13 @@ async function loadSet(list, btnId) {
   $("evCount").textContent = "0";
   $("graphPanel").hidden = true;
   $("storyHint").textContent = "Reconstruct the night, then interrogate the memory below.";
+  renderChips();
   for (const f of list) { try { await post("/api/fragment", { text: f }); addCard(f); } catch (e) {} }
   setStatus(`${evidence.length} pieces of evidence logged — now Reconstruct.`);
   btn.disabled = false;
 }
-$("seedBtn").onclick = () => loadSet(DEMO, "seedBtn");
-$("seedBtn2").onclick = () => loadSet(DEMO_INCIDENT, "seedBtn2");
+$("seedBtn").onclick = () => loadSet(DEMO, "seedBtn", QUESTIONS_NIGHT);
+$("seedBtn2").onclick = () => loadSet(DEMO_INCIDENT, "seedBtn2", QUESTIONS_INCIDENT);
 
 $("reconstructBtn").onclick = async () => {
   $("reconstructBtn").disabled = true;
@@ -126,6 +146,7 @@ $("reconstructBtn").onclick = async () => {
   try {
     const d = await post("/api/reconstruct");
     hasMemory = true;
+    renderChips();
     setStatus("Memory reconstructed. Interrogate it, or open the connection board.");
     $("storyHint").textContent = `Memory built — ${d.nodes || ""} facts. Ask it anything below.`;
   } catch (e) { setStatus("error: " + e.message); }
@@ -153,6 +174,7 @@ $("forgetBtn").onclick = async () => {
     $("answers").innerHTML = ""; $("evCount").textContent = "0";
     $("graphPanel").hidden = true;
     $("storyHint").textContent = "Reconstruct the night, then interrogate the memory below.";
+    renderChips();
     setStatus("Case closed. Memory erased.");
   } catch (e) { setStatus("error: " + e.message); }
 };
@@ -187,3 +209,7 @@ $("graphBtn").onclick = () => {
   frame.onload = () => { stop(); $("graphLoading").textContent = ""; };
   frame.src = "/api/graph?t=" + Date.now();
 };
+
+$("query").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !$("recallBtn").disabled) $("recallBtn").click();
+});

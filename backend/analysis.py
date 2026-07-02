@@ -19,8 +19,8 @@ class ConflictReport(BaseModel):
 
 
 _SYSTEM = (
-    "You are a memory-conflict detector reviewing one person's recovered memories of a "
-    "night out. From the facts, find pairs that describe the SAME thing in INCOMPATIBLE "
+    "You are a memory-conflict detector reviewing recovered fragments of an event. "
+    "From the facts, find pairs that describe the SAME thing in INCOMPATIBLE "
     "ways (e.g. the same object in two different places, or one event at two different "
     "times). Report each distinct contradiction only ONCE. Only report genuine "
     "contradictions; return an empty list if there are none."
@@ -52,9 +52,10 @@ def _dedupe(conflicts):
 
 async def _memory_context():
     results = await cognee.recall(
-        query_text="Everything known about the night, including where the jacket was left.",
+        query_text="List every fact currently held in memory.",
         query_type=SearchType.GRAPH_COMPLETION,
         only_context=True,
+        top_k=50,
     )
     parts = []
     for r in results:

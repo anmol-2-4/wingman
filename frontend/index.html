@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Wingman — Where's My Context?</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎲</text></svg>" />
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
@@ -11,6 +12,13 @@
     <div class="filetag">CASE FILE · WNGMN-04B · built on Cognee</div>
     <h1>Where's my context?</h1>
     <p class="status"><span class="dot"></span><span id="statusText">A night in Vegas. No memory. Reconstruct it from the evidence.</span></p>
+    <div class="lifecycle">
+      <span class="verb">remember()</span><span class="arrow">→</span>
+      <span class="verb">recall()</span><span class="arrow">→</span>
+      <span class="verb">improve()</span><span class="arrow">→</span>
+      <span class="verb">forget()</span>
+      <span class="lifenote">the full Cognee memory lifecycle, self-hosted</span>
+    </div>
   </header>
 
   <main class="board">
@@ -35,7 +43,7 @@
     </section>
 
     <section class="col story">
-      <div class="colhead">The story</div>
+      <div class="colhead">The story <span id="stamp" class="stamp" hidden>RECONSTRUCTED</span></div>
       <p class="hint lead" id="storyHint">Reconstruct the night, then interrogate the memory below.</p>
       <div class="askbar">
         <span class="prompt">ask&gt;</span>
@@ -43,6 +51,7 @@
         <button id="recallBtn">Ask</button>
         <button id="contraBtn" class="ghost">Find conflicts</button>
       </div>
+      <div id="chips" class="chips"></div>
       <div id="answers"></div>
     </section>
 

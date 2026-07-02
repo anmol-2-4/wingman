@@ -25,7 +25,6 @@ class Fragment(BaseModel):
 
 class Query(BaseModel):
     text: str
-    mode: str = "ask"
 
 
 @app.get("/api/status")
@@ -50,7 +49,7 @@ async def reconstruct():
 
 @app.post("/api/recall")
 async def recall(q: Query):
-    return {"answers": await memory.recall(q.text, q.mode)}
+    return {"answers": await memory.recall(q.text)}
 
 
 @app.post("/api/contradictions")

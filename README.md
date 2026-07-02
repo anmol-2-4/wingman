@@ -76,7 +76,7 @@ Cognee is the brain. The local LLM only phrases answers over what Cognee retriev
 
 **The differentiator — it doesn't just remember, it catches contradictions.**
 
-- **⚔️ Contradiction detection** — flags conflicting memories (e.g. *jacket at the pool*
+- **⚔️ Contradiction detection** — flags conflicting memories (e.g. *jacket at the pool* vs *jacket in the taxi*)
 - **🧩 Reconstruct** — messy fragments become a structured knowledge graph.
 - **💬 Interrogate** — natural-language questions, answered from the graph.
 - **🕸️ Live memory graph** — an interactive visualization of exactly what it remembers.
